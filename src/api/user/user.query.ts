@@ -4,12 +4,16 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+
 import { userService } from "./user.service";
-import { useAuthStore } from "@/stores/authStore";
-import { authService } from "../auth/auth.service";
-import { useRouter } from "next/navigation";
 import { UpdateMyInfoRequest } from "./user.schema";
+
 import { Message } from "../auth/auth.schema";
+import { authService } from "../auth/auth.service";
+
+import { useRouter } from "next/navigation";
+
+import { useAuthStore } from "@/stores/authStore";
 import { useToastStore } from "@/stores/toastStore";
 import { useModalStore } from "@/stores/modalStore";
 

@@ -1,5 +1,14 @@
 "use client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useRouter } from "next/navigation";
+
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
 import { articleService } from "./article.service";
 import {
   CreateArticleRequest,
@@ -8,8 +17,6 @@ import {
   UpdateArticleRequest,
   UpdateArticleResponse,
 } from "./article.schema";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 const STALE_TIME_5_MIN = 1000 * 60 * 5;
 const GC_TIME_10_MIN = 1000 * 60 * 10;

@@ -1,12 +1,16 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
+
 import {
   CreateArticleCommentRequest,
   UpdateArticleCommentRequest,
+  CreateArticleCommentResponse,
+  UpdateArticleCommentResponse,
 } from "./article-comment.schema";
-import { CreateArticleCommentResponse } from "./article-comment.schema";
 import { articleCommentService } from "./article-comment.service";
-import { UpdateArticleCommentResponse } from "./article-comment.schema";
-import { useInfiniteQuery } from "@tanstack/react-query";
 
 // 댓글 불러오기 params
 type GetArticleCommentParams = {
