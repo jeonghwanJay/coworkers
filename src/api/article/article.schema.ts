@@ -23,6 +23,8 @@ export type CreateArticleRequest = {
   title: string;
 };
 
+export type UpdateArticleRequest = CreateArticleRequest;
+
 export type CreateArticleResponse = ArticleType;
 
 export type GetArticleListResponse = {
@@ -31,8 +33,6 @@ export type GetArticleListResponse = {
 };
 
 export type GetArticleDetailResponse = ArticleDetailType;
-
-export type UpdateArticleRequest = CreateArticleRequest;
 
 export type UpdateArticleResponse = ArticleDetailType;
 

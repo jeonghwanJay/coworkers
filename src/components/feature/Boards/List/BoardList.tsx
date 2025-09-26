@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { OrderType, ORDER_TYPE } from "@/constants/orderType";
 import { useState } from "react";
 import Pagination from "@/components/feature/Boards/Pagination/Pagination";
-import { useArticleList } from "@/api/article/article.query";
+import { useArticles } from "@/api/article/article.query";
 import EmptyCard from "../Card/EmptyCard";
 import useDebounce from "@/hooks/useDebounce";
 import IfElse from "../../../common/IfElse/IfElse";
@@ -21,7 +21,7 @@ export default function BoardList({ keyword }: BoardListProps) {
   const pageSize = 6;
   const debouncedKeyword = useDebounce(keyword, 300);
 
-  const { data: articleList = [], totalCount = 0 } = useArticleList({
+  const { data: articleList = [], totalCount = 0 } = useArticles({
     page,
     pageSize,
     orderBy,

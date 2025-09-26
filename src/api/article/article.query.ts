@@ -20,7 +20,7 @@ import {
 
 const STALE_TIME_5_MIN = 1000 * 60 * 5;
 const GC_TIME_10_MIN = 1000 * 60 * 10;
-type LikeAction = "add" | "delete";
+type LikeAction = "like" | "unlike";
 
 // 게시글 작성
 export const useCreateArticle = (options?: {
@@ -53,7 +53,7 @@ export const useLikeArticle = (action: LikeAction) => {
 
   return useMutation<GetArticleDetailResponse, Error, string>({
     mutationFn: (articleId) =>
-      action === "add"
+      action === "like"
         ? articleService.addLikeArticle(articleId)
         : articleService.deleteLikeArticle(articleId),
     onSuccess: () => {
@@ -63,17 +63,8 @@ export const useLikeArticle = (action: LikeAction) => {
   });
 };
 
-//베스트 게시글 목록 불러오기
-export const useBestArticles = () => {
-  return useArticleList({
-    orderBy: "like",
-    pageSize: 3,
-    page: 1,
-  });
-};
-
 //전체 게시글 목록 불러오기
-export const useArticleList = (params?: {
+export const useArticles = (params?: {
   page?: number;
   pageSize?: number;
   orderBy?: string;
@@ -91,6 +82,15 @@ export const useArticleList = (params?: {
     data: query.data?.list ?? [],
     totalCount: query.data?.totalCount ?? 0,
   };
+};
+
+//베스트 게시글 목록 불러오기
+export const useBestArticles = () => {
+  return useArticles({
+    orderBy: "like",
+    pageSize: 3,
+    page: 1,
+  });
 };
 
 // 게시글 상세 내용 불러오기
