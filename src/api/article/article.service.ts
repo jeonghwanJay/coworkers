@@ -10,47 +10,46 @@ import {
   UpdateArticleResponse,
 } from "./article.schema";
 
-class ArticleService {
-  private getBasePath(articleId?: string) {
-    return articleId != null ? `/articles/${articleId}` : "/articles";
-  }
+const getBasePath = (articleId?: string) => {
+  return articleId != null ? `/articles/${articleId}` : "/articles";
+};
 
-  createArticle(body: CreateArticleRequest) {
-    return api.post<CreateArticleResponse>(this.getBasePath(), body);
-  }
-  getArticleList(params?: {
-    page?: number;
-    pageSize?: number;
-    orderBy?: string;
-    keyword?: string;
-  }) {
-    return api.get<GetArticleListResponse>(this.getBasePath(), {
-      params,
-      headers: {
-        "Accept-Encoding": "identity",
-      },
-    });
-  }
-  getArticleDetail(articleId: string) {
-    return api.get<GetArticleDetailResponse>(this.getBasePath(articleId));
-  }
-  updateArticle(articleId: string, body: UpdateArticleRequest) {
-    return api.patch<UpdateArticleResponse>(this.getBasePath(articleId), body);
-  }
-  deleteArticle(articleId: string) {
-    return api.delete(this.getBasePath(articleId));
-  }
-  addLikeArticle(articleId: string) {
-    return api.post<LikeArticleResponse>(
-      `${this.getBasePath(articleId)}/like`,
-      null,
-    );
-  }
-  deleteLikeArticle(articleId: string) {
-    return api.delete<LikeArticleResponse>(
-      `${this.getBasePath(articleId)}/like`,
-    );
-  }
-}
+export const getArticleList = (params?: {
+  page?: number;
+  pageSize?: number;
+  orderBy?: string;
+  keyword?: string;
+}) => {
+  return api.get<GetArticleListResponse>(getBasePath(), {
+    params,
+  });
+};
 
-export const articleService = new ArticleService();
+export const getArticleDetail = (articleId: string) => {
+  return api.get<GetArticleDetailResponse>(getBasePath(articleId));
+};
+
+export const createArticle = (body: CreateArticleRequest) => {
+  return api.post<CreateArticleResponse>(getBasePath(), body);
+};
+
+export const updateArticle = (
+  articleId: string,
+  body: UpdateArticleRequest,
+) => {
+  return api.patch<UpdateArticleResponse>(getBasePath(articleId), body);
+};
+
+export const deleteArticle = (articleId: string) => {
+  return api.delete(getBasePath(articleId));
+};
+
+export const addLikeArticle = (articleId: string) => {
+  return api.post<LikeArticleResponse>(`${getBasePath(articleId)}/like`, null);
+};
+
+export const deleteLikeArticle = (articleId: string) => {
+  return api.delete<LikeArticleResponse>(
+    getBasePath(`${getBasePath(articleId)}/like`),
+  );
+};

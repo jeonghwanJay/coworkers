@@ -9,7 +9,15 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 
-import { articleService } from "./article.service";
+import {
+  getArticleList,
+  getArticleDetail,
+  createArticle,
+  updateArticle,
+  deleteArticle,
+  addLikeArticle,
+  deleteLikeArticle,
+} from "./article.service";
 import {
   CreateArticleRequest,
   CreateArticleResponse,
@@ -22,6 +30,45 @@ const STALE_TIME_5_MIN = 1000 * 60 * 5;
 const GC_TIME_10_MIN = 1000 * 60 * 10;
 type LikeAction = "like" | "unlike";
 
+//전체 게시글 목록 불러오기
+export const useArticles = (params?: {
+  page?: number;
+  pageSize?: number;
+  orderBy?: string;
+  keyword?: string;
+}) => {
+  const query = useSuspenseQuery({
+    queryKey: ["articles", params],
+    queryFn: () => getArticleList(params),
+    staleTime: STALE_TIME_5_MIN,
+    gcTime: GC_TIME_10_MIN,
+  });
+
+  return {
+    ...query,
+    data: query.data?.list ?? [],
+    totalCount: query.data?.totalCount ?? 0,
+  };
+};
+
+// 게시글 상세 내용 불러오기
+export const useArticleDetail = (articleId: string) => {
+  return useQuery({
+    queryKey: ["article", articleId],
+    queryFn: () => getArticleDetail(articleId),
+    enabled: !!articleId,
+  });
+};
+
+//베스트 게시글 목록 불러오기
+export const useBestArticles = () => {
+  return useArticles({
+    orderBy: "like",
+    pageSize: 3,
+    page: 1,
+  });
+};
+
 // 게시글 작성
 export const useCreateArticle = (options?: {
   onSuccess: () => void;
@@ -31,7 +78,7 @@ export const useCreateArticle = (options?: {
   const router = useRouter();
 
   return useMutation<CreateArticleResponse, Error, CreateArticleRequest>({
-    mutationFn: (body) => articleService.createArticle(body),
+    mutationFn: (body) => createArticle(body),
 
     onSuccess: () => {
       options?.onSuccess();
@@ -47,67 +94,12 @@ export const useCreateArticle = (options?: {
   });
 };
 
-// 게시글 좋아요 / 취소 공통 훅
-export const useLikeArticle = (action: LikeAction) => {
-  const queryClient = useQueryClient();
-
-  return useMutation<GetArticleDetailResponse, Error, string>({
-    mutationFn: (articleId) =>
-      action === "like"
-        ? articleService.addLikeArticle(articleId)
-        : articleService.deleteLikeArticle(articleId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["article"] });
-      queryClient.invalidateQueries({ queryKey: ["articles"] });
-    },
-  });
-};
-
-//전체 게시글 목록 불러오기
-export const useArticles = (params?: {
-  page?: number;
-  pageSize?: number;
-  orderBy?: string;
-  keyword?: string;
-}) => {
-  const query = useSuspenseQuery({
-    queryKey: ["articles", params],
-    queryFn: () => articleService.getArticleList(params),
-    staleTime: STALE_TIME_5_MIN,
-    gcTime: GC_TIME_10_MIN,
-  });
-
-  return {
-    ...query,
-    data: query.data?.list ?? [],
-    totalCount: query.data?.totalCount ?? 0,
-  };
-};
-
-//베스트 게시글 목록 불러오기
-export const useBestArticles = () => {
-  return useArticles({
-    orderBy: "like",
-    pageSize: 3,
-    page: 1,
-  });
-};
-
-// 게시글 상세 내용 불러오기
-export const useArticleDetail = (articleId: string) => {
-  return useQuery({
-    queryKey: ["article", articleId],
-    queryFn: () => articleService.getArticleDetail(articleId),
-    enabled: !!articleId,
-  });
-};
-
 // 게시글 수정하기
 export const useEditArticle = (articleId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation<UpdateArticleResponse, Error, UpdateArticleRequest>({
-    mutationFn: (body) => articleService.updateArticle(articleId, body),
+    mutationFn: (body) => updateArticle(articleId, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["article"] });
       queryClient.invalidateQueries({ queryKey: ["articles"] });
@@ -120,10 +112,26 @@ export const useDeleteArticle = () => {
   const queryClient = useQueryClient();
 
   return useMutation<unknown, Error, string>({
-    mutationFn: (articleId) => articleService.deleteArticle(articleId),
+    mutationFn: (articleId) => deleteArticle(articleId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["articles"] });
       queryClient.invalidateQueries({ queryKey: ["article"] });
+    },
+  });
+};
+
+// 게시글 좋아요 / 취소 공통 훅
+export const useLikeArticle = (action: LikeAction) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<GetArticleDetailResponse, Error, string>({
+    mutationFn: (articleId) =>
+      action === "like"
+        ? addLikeArticle(articleId)
+        : deleteLikeArticle(articleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["article"] });
+      queryClient.invalidateQueries({ queryKey: ["articles"] });
     },
   });
 };
