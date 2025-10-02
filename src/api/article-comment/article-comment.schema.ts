@@ -13,14 +13,11 @@ export type ArticleCommentType = {
 };
 
 export type CreateArticleCommentRequest = CommentBody;
-
-export type CreateArticleCommentResponse = ArticleCommentType;
+export type UpdateArticleCommentRequest = CommentBody;
 
 export type GetArticleCommentResponse = {
   nextCursor: number;
   list: ArticleCommentType[];
 };
-
-export type UpdateArticleCommentRequest = CommentBody;
-
+export type CreateArticleCommentResponse = ArticleCommentType;
 export type UpdateArticleCommentResponse = ArticleCommentType;

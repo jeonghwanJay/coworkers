@@ -10,24 +10,45 @@ import {
   CreateArticleCommentResponse,
   UpdateArticleCommentResponse,
 } from "./article-comment.schema";
-import { articleCommentService } from "./article-comment.service";
 
-// 댓글 불러오기 params
+import {
+  getArticleComment,
+  createArticleComment,
+  updateArticleComment,
+  deleteArticleComment,
+} from "./article-comment.service";
+
 type GetArticleCommentParams = {
   limit: number;
   cursor?: number;
 };
 
-// 댓글 작성하기 params
 type CreateArticleCommentParams = {
   articleId: string;
   body: CreateArticleCommentRequest;
 };
 
-// 댓글 수정하기 params
 type EditArticleCommentParams = {
   commentId: string;
   body: UpdateArticleCommentRequest;
+};
+
+// 게시글 댓글 무한 스크롤
+export const useInfiniteArticleComments = (
+  articleId: string,
+  params: GetArticleCommentParams,
+) => {
+  return useInfiniteQuery({
+    queryKey: ["articleComment", articleId],
+    queryFn: ({ pageParam }: { pageParam?: number }) =>
+      getArticleComment(articleId, {
+        ...params,
+        cursor: pageParam,
+      }),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined,
+    enabled: !!articleId,
+  });
 };
 
 // 게시글 댓글 작성
@@ -39,8 +60,7 @@ export const useCreateArticleComment = () => {
     Error,
     CreateArticleCommentParams
   >({
-    mutationFn: ({ articleId, body }) =>
-      articleCommentService.createArticleComment(articleId, body),
+    mutationFn: ({ articleId, body }) => createArticleComment(articleId, body),
 
     onSuccess: (_, { articleId }) => {
       queryClient.invalidateQueries({ queryKey: ["article"] });
@@ -48,24 +68,6 @@ export const useCreateArticleComment = () => {
         queryKey: ["articleComment", articleId],
       });
     },
-  });
-};
-
-// 게시글 댓글 무한스크롤
-export const useInfiniteArticleComments = (
-  articleId: string,
-  params: GetArticleCommentParams,
-) => {
-  return useInfiniteQuery({
-    queryKey: ["articleComment", articleId, params],
-    queryFn: ({ pageParam }: { pageParam?: number }) =>
-      articleCommentService.getArticleComment(articleId, {
-        ...params,
-        cursor: pageParam,
-      }),
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    initialPageParam: undefined,
-    enabled: !!articleId,
   });
 };
 
@@ -78,8 +80,7 @@ export const useEditArticleComment = () => {
     Error,
     EditArticleCommentParams
   >({
-    mutationFn: ({ commentId, body }) =>
-      articleCommentService.updateArticleComment(commentId, body),
+    mutationFn: ({ commentId, body }) => updateArticleComment(commentId, body),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["articleComment"] });
@@ -92,8 +93,7 @@ export const useDeleteArticleComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation<unknown, Error, string>({
-    mutationFn: (commentId) =>
-      articleCommentService.deleteArticleComment(commentId),
+    mutationFn: (commentId) => deleteArticleComment(commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["articleComment"] });
       queryClient.invalidateQueries({ queryKey: ["article"] });

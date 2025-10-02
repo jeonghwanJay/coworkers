@@ -8,37 +8,48 @@ import {
   UpdateArticleCommentResponse,
 } from "./article-comment.schema";
 
-class ArticleCommentService {
-  private getArticlePath(articleId: string) {
-    return `/articles/${articleId}/comments`;
-  }
-  private getCommentPath(commentId: string) {
-    return `/comments/${commentId}`;
-  }
+type GetArticleCommentParams = {
+  limit: number;
+  cursor?: number;
+};
 
-  createArticleComment(articleId: string, body: CreateArticleCommentRequest) {
-    return api.post<CreateArticleCommentResponse>(
-      this.getArticlePath(articleId),
-      body,
-    );
-  }
-  getArticleComment(
-    articleId: string,
-    params: { limit: number; cursor?: number },
-  ) {
-    return api.get<GetArticleCommentResponse>(this.getArticlePath(articleId), {
-      params,
-    });
-  }
-  updateArticleComment(commentId: string, body: UpdateArticleCommentRequest) {
-    return api.patch<UpdateArticleCommentResponse>(
-      this.getCommentPath(commentId),
-      body,
-    );
-  }
-  deleteArticleComment(commentId: string) {
-    return api.delete(this.getCommentPath(commentId));
-  }
-}
+const getArticlePath = (articleId?: string) => {
+  return `/articles/${articleId}/comments`;
+};
 
-export const articleCommentService = new ArticleCommentService();
+const getCommentPath = (commentId: string) => {
+  return `/comments/${commentId}`;
+};
+
+export const getArticleComment = (
+  articleId: string,
+  params: GetArticleCommentParams,
+) => {
+  return api.get<GetArticleCommentResponse>(getArticlePath(articleId), {
+    params,
+  });
+};
+
+export const createArticleComment = (
+  articleId: string,
+  body: CreateArticleCommentRequest,
+) => {
+  return api.post<CreateArticleCommentResponse>(
+    getArticlePath(articleId),
+    body,
+  );
+};
+
+export const updateArticleComment = (
+  commentId: string,
+  body: UpdateArticleCommentRequest,
+) => {
+  return api.patch<UpdateArticleCommentResponse>(
+    getCommentPath(commentId),
+    body,
+  );
+};
+
+export const deleteArticleComment = (commentId: string) => {
+  return api.delete(getCommentPath(commentId));
+};
